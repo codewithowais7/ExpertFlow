@@ -105,3 +105,35 @@ exports.getExpert = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Register a new expert
+// @route   POST /api/experts
+exports.createExpert = async (req, res, next) => {
+  try {
+    const { name, title, bio, avatar, specialties, hourlyRate, availability } = req.body;
+
+    // Validate required fields
+    if (!name || !title || !specialties || !hourlyRate || !availability) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, title, specialties, hourlyRate, and availability'
+      });
+    }
+
+    const expert = await Expert.create({
+      name,
+      title,
+      bio: bio || '',
+      avatar: avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4D5CF1&color=fff&size=256&bold=true`,
+      specialties,
+      hourlyRate,
+      rating: 0,
+      reviewCount: 0,
+      availability
+    });
+
+    res.status(201).json({ success: true, data: expert });
+  } catch (error) {
+    next(error);
+  }
+};
