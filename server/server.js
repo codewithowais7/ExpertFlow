@@ -14,10 +14,13 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// Sanitize CLIENT_URL — strip trailing slash to prevent CORS mismatch
+const CLIENT_URL = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/+$/, '');
+
 // Socket.io setup with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: CLIENT_URL,
     methods: ['GET', 'POST', 'PATCH']
   }
 });
@@ -30,7 +33,7 @@ socketHandler(io);
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: CLIENT_URL,
   credentials: true
 }));
 app.use(express.json());
@@ -53,6 +56,6 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`🚀 ExpertFlow server running on port ${PORT}`);
-    console.log(`🌐 CORS origin: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+    console.log(`🌐 CORS origin: ${CLIENT_URL}`);
   });
 });
